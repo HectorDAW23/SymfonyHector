@@ -2,11 +2,12 @@
 
 namespace App\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 
-class EquipsController
+class EquipsController extends AbstractController
 {
    private $equips = array(
        array("codi" => "1", "nom" => "Equip Roig", "cicle" => "DAW", "curs" => "22/23", "membres" => array("David", "Alejandro", "Jose", "Marta")),
@@ -16,28 +17,23 @@ class EquipsController
    );
 
 
-   #[Route('/equip/{codi}', name: 'dades_equip')]
-   public function dades($codi)
-   {
-       $resultat = array_filter($this->equips, function ($dades) use ($codi) {
-           return $dades["codi"] == $codi;
-       });
+   #[Route('/equip/{codi<\d+>?1}',name:'dades_equip')]
+    public function dades($codi){
+       $resultat = array_filter(
+           $this->equips,
+           function ($dades) use ($codi) {
+               return $dades["codi"]==$codi;
+           }
+       );
 
 
-       if (count($resultat) > 0) {
-           $resposta = "";
-           $resultat = array_shift($resultat);
-           $mb = implode(" ", $resultat["membres"]);
-           $resposta .= "<ul><li>" . $resultat["nom"] . "</li>" .
-               "<li>" . $resultat["cicle"] . "</li>" .
-               "<li>" . $resultat["curs"] . "</li>" .
-               "<li>" . $mb . "</li></ul>";
-               
-           return new Response("<html><body>$resposta</body></html>");
-       } else {
-           return new Response("No s'ha trobat l'equip : " . $codi);
+       if(count($resultat)>0){
+           return $this->render('dades_equip.html.twig', array('dades' => array_shift($resultat)));
+       }else{
+           return $this->render('dades_equip.html.twig', array('dades' => array_shift($resultat)));
        }
-   }
+    }
+
 }
 
 
